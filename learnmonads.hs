@@ -28,3 +28,29 @@ tryval2 :: Bool
 tryval2 = let f = bind' (add' 2) $ bind' (sub' 3) (add' 5)
               (v, _) = f 3
           in v == -3
+
+-- Writing my own Logging data.
+data Logging a = Logging (a, String) deriving (Show)
+
+instance Functor (Logging) where
+  fmap f (Logging (a, s)) = Logging (f a, s)
+
+instance Applicative (Logging) where
+  pure a = Logging (a, "")
+  Logging (f, s1) <*> Logging (a, s2) = Logging (f a, s1 ++ s2)
+
+-- Here is the monad.
+instance Monad (Logging) where
+  Logging (a, s1) >>= f = let Logging (b,s2) = f a
+                          in Logging (b, s1 ++ s2)
+
+-- Same like add' and sub'
+add'' :: Int -> Int -> Logging Int
+add'' a b = Logging (add a b, show a ++ " + " ++ show b ++ " = " ++ show (add a b) ++ ";")
+
+sub'' :: Int -> Int -> Logging Int
+sub'' a b = Logging (sub a b, show a ++ " - " ++ show b ++ " = " ++ show (sub a b) ++ ";")
+
+-- Composing using bind (>>=): 2 + (3 - (5 + 3)) but read code as piping value.
+tryval3 :: Logging Bool
+tryval3 = fmap (== -3) $ add'' 5 3 >>= sub'' 3 >>= add'' 2
