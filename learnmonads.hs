@@ -1,3 +1,5 @@
+import System.Random
+
 -- Learning Monads
 -- Example of putting logging inside two functions : add/sub
 add :: Int -> Int -> Int
@@ -55,7 +57,7 @@ sub'' a b = Logging (sub a b, show a ++ " - " ++ show b ++ " = " ++ show (sub a 
 tryval3 :: Logging Bool
 tryval3 = fmap (== -3) $ add'' 5 3 >>= sub'' 3 >>= add'' 2
 
---------------------- Next Monad -------------------------
+--------------------- List Monad -------------------------
 ----------------------------------------------------------
 halfs :: Float -> [Float]
 halfs a = [0, a/2, a]
@@ -71,3 +73,23 @@ halfthirds x = bind'' halfs . thirds $ x
 
 halfthirdsMonadic :: Float -> [Float]
 halfthirdsMonadic x = [z | y <- thirds x, z <- halfs y]
+
+------------------- Ramdom Monad -----------------------
+--------------------------------------------------------
+incRandom :: Int -> StdGen -> (Int, StdGen)
+incRandom v g = let (a, g') = random g
+                in (v + a, g')
+
+strRandom :: Int -> StdGen -> (String, StdGen)
+strRandom v g = let (a, g') = random g :: (Int, StdGen)
+                in (show v ++ ":" ++ show a, g')
+
+bindRandom :: (a -> StdGen -> (b, StdGen)) -> (a, StdGen) -> (b, StdGen)
+bindRandom f = \(v, g) -> f v g
+
+bindFGtest :: Int -> StdGen -> (String, StdGen)
+bindFGtest v g = bindRandom strRandom . incRandom v $ g -- want to do .. (strRandom (incRandom 1)
+
+tryRandom :: Int -> Int -> (String, StdGen)
+tryRandom initial seed = let g = mkStdGen seed
+                     in bindFGtest initial g
