@@ -54,3 +54,20 @@ sub'' a b = Logging (sub a b, show a ++ " - " ++ show b ++ " = " ++ show (sub a 
 -- Composing using bind (>>=): 2 + (3 - (5 + 3)) but read code as piping value.
 tryval3 :: Logging Bool
 tryval3 = fmap (== -3) $ add'' 5 3 >>= sub'' 3 >>= add'' 2
+
+--------------------- Next Monad -------------------------
+----------------------------------------------------------
+halfs :: Float -> [Float]
+halfs a = [0, a/2, a]
+
+thirds :: Float -> [Float]
+thirds a = [0, a/3, 2*a/3, a]
+
+bind'' :: (Float -> [Float]) -> [Float] -> [Float]
+bind'' f vs = concat $ map f vs
+
+halfthirds :: Float -> [Float]
+halfthirds x = bind'' halfs . thirds $ x
+
+halfthirdsMonadic :: Float -> [Float]
+halfthirdsMonadic x = [z | y <- thirds x, z <- halfs y]
