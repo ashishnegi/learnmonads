@@ -74,7 +74,7 @@ halfthirds x = bind'' halfs . thirds $ x
 halfthirdsMonadic :: Float -> [Float]
 halfthirdsMonadic x = [z | y <- thirds x, z <- halfs y]
 
-------------------- Ramdom Monad -----------------------
+------------------- Random Monad -----------------------
 --------------------------------------------------------
 incRandom :: Int -> StdGen -> (Int, StdGen)
 incRandom v g = let (a, g') = random g
@@ -84,12 +84,13 @@ strRandom :: Int -> StdGen -> (String, StdGen)
 strRandom v g = let (a, g') = random g :: (Int, StdGen)
                 in (show v ++ ":" ++ show a, g')
 
-bindRandom :: (a -> StdGen -> (b, StdGen)) -> (a, StdGen) -> (b, StdGen)
-bindRandom f = \(v, g) -> f v g
+bindRandom :: (a -> StdGen -> (b, StdGen)) -> (StdGen -> (a, StdGen)) -> (StdGen -> (b, StdGen))
+bindRandom f g = \sg -> let (a, g') = g sg
+                        in f a g'
 
 bindFGtest :: Int -> StdGen -> (String, StdGen)
-bindFGtest v g = bindRandom strRandom . incRandom v $ g -- want to do .. (strRandom (incRandom 1)
+bindFGtest = bindRandom strRandom . incRandom  -- want to do .. (strRandom (incRandom 1)
 
 tryRandom :: Int -> Int -> (String, StdGen)
 tryRandom initial seed = let g = mkStdGen seed
-                     in bindFGtest initial g
+                         in bindFGtest initial g
