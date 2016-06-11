@@ -49,3 +49,26 @@ test7 = do
     return (a,b)
 
 go7 = evalState (evalStateT test3 0) "0"
+
+
+newtype MaybeT m a = MaybeT { runMaybeT :: m (Maybe a) }
+
+instance (Functor m) => Functor (MaybeT m) where
+  fmap f a = MaybeT $ fmap (\x -> fmap f x) (runMaybeT a)
+
+instance (Applicative m) => Applicative (MaybeT m) where
+  pure = MaybeT . pure . Just
+  mf <*> ma = MaybeT $ (\f a -> f <*> a) <$> (runMaybeT mf) <*> (runMaybeT ma)
+
+instance (Monad m) => Monad (MaybeT m) where
+  mma >>= f = MaybeT $ do
+      ma <- runMaybeT mma -- Maybe a
+      case ma of
+        Nothing -> return Nothing
+        Just a -> runMaybeT $ f a
+
+instance (Alternative m) => Alternative (MaybeT m) where
+  empty = MaybeT $ pure Nothing
+  mma <|> mmb = MaybeT $ (runMaybeT mma) <|> (runMaybeT mmb)
+
+instance (Alternative m, Monad m) => MonadPlus (MaybeT m)
