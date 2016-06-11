@@ -72,3 +72,14 @@ instance (Alternative m) => Alternative (MaybeT m) where
   mma <|> mmb = MaybeT $ (runMaybeT mma) <|> (runMaybeT mmb)
 
 instance (Alternative m, Monad m) => MonadPlus (MaybeT m)
+
+-- instance (Alternative m, Monad m) => MonadPlus (MaybeT m) where
+  -- mzero = empty
+  -- mplus = (<|>)
+
+ -- mzero = MaybeT $ pure Nothing
+ -- mplus mmma mmmb = MaybeT $ do
+ --   ma <- runMaybeT mmma
+ --   case ma of
+ --     Nothing -> runMaybeT mmmb
+ --     Just a -> return ma
