@@ -99,7 +99,7 @@ getPassphrase = do
 
 askPassphrase :: MaybeT IO ()
 askPassphrase = do
-  lift $ putStrLn "Enter password < 8 , alpha, number and punctuation:"
+  lift $ putStrLn "Enter password >= 8 , alpha, number and punctuation:"
   p <- getPassphrase
   lift $ putStrLn $ "Your password is " ++ p
 
