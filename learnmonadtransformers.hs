@@ -91,24 +91,17 @@ instance (Alternative m, Monad m) => MonadPlus (MaybeT m)
 instance MonadTrans MaybeT where
   lift = MaybeT . fmap Just
 
-getPassphrase :: IO (Maybe String)
+getPassphrase :: MaybeT IO String
 getPassphrase = do
-  password <- getLine
-  if isValid password
-  then return $ Just password
-  else return Nothing
+  password <- lift getLine
+  guard $ isValid password
+  return password
 
-
-askPassphrase :: IO ()
+askPassphrase :: MaybeT IO ()
 askPassphrase = do
-  putStrLn "Enter password < 8 , alpha, number and punctuation:"
+  lift $ putStrLn "Enter password < 8 , alpha, number and punctuation:"
   p <- getPassphrase
-  case p of
-    Nothing -> do
-      putStrLn "Invalid password. Enter again:"
-      askPassphrase
-    Just password ->
-      putStrLn $ "Your password is " ++ password
+  lift $ putStrLn $ "Your password is " ++ p
 
 -- The validation test could be anything we want it to be.
 isValid :: String -> Bool
@@ -116,3 +109,8 @@ isValid s = length s >= 8
             && any isAlpha s
             && any isNumber s
             && any isPunctuation s
+
+main :: IO ()
+main = do
+  a <- runMaybeT askPassphrase
+  return ()
