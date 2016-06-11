@@ -112,5 +112,15 @@ isValid s = length s >= 8
 
 main :: IO ()
 main = do
-  a <- runMaybeT askPassphrase
-  return ()
+  runMaybeT askPassphrase >> return ()
+
+-- Thanks to ErikR
+-- http://stackoverflow.com/questions/37761433/understanding-monadtransformer-examples/
+-- ask Passphrase with errors as well.
+askPassphrase2 :: MaybeT IO ()
+askPassphrase2 = do
+  lift $ putStrLn "Enter password < 8 , alpha, number and punctuation:"
+  result <- lift $ runMaybeT getPassphrase
+  case result of
+    Nothing -> lift $ putStrLn "Bad password"
+    Just pw -> lift $ putStrLn $ "Your password is " ++ pw
