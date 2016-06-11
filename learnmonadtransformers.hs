@@ -4,6 +4,7 @@ import Control.Monad.State
 import Control.Monad.Identity
 import Control.Applicative
 
+-- http://blog.sigfpe.com/2006/05/grok-haskell-monad-transformers.html
 test1 = do
             a <- get
             modify (+1)
@@ -51,6 +52,8 @@ test7 = do
 go7 = evalState (evalStateT test3 0) "0"
 
 
+-- https://en.wikibooks.org/wiki/Haskell/Monad_transformers
+
 newtype MaybeT m a = MaybeT { runMaybeT :: m (Maybe a) }
 
 instance (Functor m) => Functor (MaybeT m) where
@@ -83,3 +86,6 @@ instance (Alternative m, Monad m) => MonadPlus (MaybeT m)
  --   case ma of
  --     Nothing -> runMaybeT mmmb
  --     Just a -> return ma
+
+instance MonadTrans MaybeT where
+  lift = MaybeT . fmap Just
