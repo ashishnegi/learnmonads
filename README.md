@@ -1,6 +1,9 @@
 # learnmonads
-My sample codes while learning Monads using the tutorial at : 
-http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html
+My sample codes while learning Monads using the tutorial at :
+
+1. http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html
+2. http://blog.sigfpe.com/2006/05/grok-haskell-monad-transformers.html
+3. https://hackage.haskell.org/package/MaybeT-0.1.2/docs/Control-Monad-Maybe.html
 
 ```haskell
 -- Some thoughts from the tutorial :  http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html
